@@ -84,7 +84,7 @@ const Navbar = () => {
                </div>
                <div onClick={toggleAccountMenu} className="flex flex-row items-center gap-2 cursor-pointer relative">
                   <div className="w-6 h-6 lg:w-10 lg:h-10 rounded-md overflow-hidden">
-                     <img src="/images/profile.png" className="rounded-md" alt="profile" />
+                     <img src="/images/avatar.png" className="rounded-md" alt="profile" />
                   </div>
                   <BsChevronDown className={`text-white transition ${showAccountMenu ? 'rotate-180' : 'rotate-0'}`} />
                   <AccountMenu visible={showAccountMenu} />

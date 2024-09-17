@@ -1,12 +1,12 @@
 "use client"
-import Input from "@/components/input";
+import Input from "@/app/components/input";
 import axios from "axios";
 import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
+import { FcGoogle } from "react-icons/fc";
+
 function LoginPage() {
-   const router = useRouter();
    const [email, setEmail] = useState("");
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
@@ -23,19 +23,17 @@ function LoginPage() {
             email,
             password,
             redirect: false,
-            callbackUrl: "/",
          });
 
          if (result?.error) {
-            console.log("Login Error:", result.error); // Log specific error
+            console.error("Login error:", result.error);
          } else {
-            console.log("Logged in successfully");
-            router.push("/");
+            window.location.href = '/profiles';
          }
       } catch (error) {
          console.log("Unexpected Error:", error);
       }
-   }, [email, password, router]);
+   }, [email, password]);
 
 
    const register = useCallback(async () => {
@@ -94,7 +92,12 @@ function LoginPage() {
                   <button onClick={variant === 'login' ? login : register} className="bg-red-600 text-white rounded-md py-3 mt-10 w-full hover:bg_red-700 transition">
                      {variant === "login" ? "Login" : "Sign up"}
                   </button>
-                  <p className="text-neutral-500 text-center mt-12">
+                  <div className="flex flex-row items-center justify-center gap-4 mt-8 jusify-center">
+                     <div onClick={() => signIn('google', { callbackUrl: '/profiles' })} className="w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer hover:opacity-80 transition">
+                        <FcGoogle size={30} />
+                     </div>
+                  </div>
+                  <p className="text-neutral-500 text-center mt-8">
                      {variant === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
                      <span onClick={toggleVariant} className="text-white cursor-pointer">
                         {variant === "login" ? "Create an account" : "Login"}

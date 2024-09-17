@@ -1,13 +1,36 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import NextAuth, { AuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { compare } from "bcrypt";
+import prismadb from "@/app/lib/prismadb";
 
-import prismadb from "@/lib/prismadb";
-
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
+   callbacks: {
+      async jwt({ token, user }) {
+         if (user) {
+            token.id = user.id;
+         }
+         return token;
+      },
+      async session({ session, token }) {
+         if (session.user) {
+            (session.user as any).id = token.id as string;
+         }
+         return session;
+      },
+      async redirect({ url, baseUrl }) {
+         if (url.startsWith(baseUrl)) return url;
+         else if (url.startsWith("/")) return new URL(url, baseUrl).toString();
+         return baseUrl;
+      },
+   },
    providers: [
-      Credentials({
-         id: "credentials",
+      GoogleProvider({
+         clientId: process.env.GOOGLE_CLIENT_ID || '',
+         clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      }),
+      CredentialsProvider({
          name: "Credentials",
          credentials: {
             email: { label: "Email", type: "text" },
@@ -40,6 +63,7 @@ const handler = NextAuth({
       signIn: "/login",
    },
    debug: process.env.NODE_ENV === "development",
+   adapter: PrismaAdapter(prismadb),
    session: {
       strategy: "jwt",
    },
@@ -47,6 +71,8 @@ const handler = NextAuth({
       secret: process.env.NEXTAUTH_JWT_SECRET,
    },
    secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
