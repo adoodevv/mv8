@@ -22,6 +22,7 @@ const Input: React.FC<InputProps> = ({
             type={type}
             value={value}
             id={id}
+            autoComplete='off'
             className="
          block
          rounded-md
